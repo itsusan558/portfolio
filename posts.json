@@ -1,0 +1,29 @@
+[
+  {
+    "id": "cloud-run-deploy-tips",
+    "title": "Cloud Run デプロイで失敗しないための 5 つのポイント",
+    "date": "2026-04-01",
+    "category": "Infrastructure",
+    "excerpt": "Cloud Run へのデプロイでハマりがちな落とし穴と、その対策をまとめました。メモリ設定、タイムアウト、Playwright の共存など実践的な知見を共有します。",
+    "tags": ["Cloud Run", "Docker", "GCP"],
+    "content": "<p>Google Cloud Run は、コンテナをサーバーレスで動かせる非常に便利なサービスです。しかし、いくつかの落とし穴があります。これまで 5 つ以上のサービスを Cloud Run にデプロイしてきた経験から、特に重要なポイントをまとめます。</p><h2>1. メモリは最低 2GB を確保する</h2><p>デフォルトの 512MB では、Playwright や FFmpeg を使うアプリケーションはすぐに OOM (Out of Memory) で落ちます。動画処理を行う場合は 4GB を推奨します。</p><pre><code>gcloud run deploy my-service \\\n  --memory 2Gi \\\n  --region asia-northeast1</code></pre><h2>2. タイムアウトを適切に設定する</h2><p>デフォルトのリクエストタイムアウトは 300 秒ですが、スクレイピングや動画処理では不十分です。最大 3600 秒まで設定可能です。</p><pre><code>gcloud run deploy my-service \\\n  --timeout 3600</code></pre><h2>3. Playwright を使う場合は Chromium をインストールする</h2><p>Dockerfile に以下を含める必要があります：</p><pre><code>RUN playwright install --with-deps chromium</code></pre><p>これを忘れると、ブラウザの起動に失敗してエラーになります。</p><h2>4. SSE を使う場合は --no-buffer を忘れない</h2><p>Server-Sent Events (SSE) でリアルタイムにデータをストリーミングする場合、Cloud Run のリバースプロキシがバッファリングしてしまうことがあります。Flask 側で適切なヘッダーを設定しましょう。</p><h2>5. ヘルスチェックエンドポイントを用意する</h2><p>Cloud Run はコンテナの起動確認にヘルスチェックを使います。<code>/health</code> エンドポイントを用意して、起動時間を短縮しましょう。</p><pre><code>@app.route('/health')\ndef health():\n    return 'ok'</code></pre><p>これらのポイントを押さえておけば、Cloud Run へのデプロイでハマることは大幅に減るはずです。</p>"
+  },
+  {
+    "id": "why-python-flask",
+    "title": "なぜ Python + Flask を選ぶのか — 個人開発における技術選定",
+    "date": "2026-03-20",
+    "category": "Development",
+    "excerpt": "フレームワーク選びで迷ったとき、私たちが Python + Flask を選ぶ理由。Express でも Django でもなく Flask を軸にしている背景をお話しします。",
+    "tags": ["Python", "Flask", "技術選定"],
+    "content": "<p>Web アプリケーションのフレームワークは無数にあります。Node.js の Express、Python の Django、Ruby on Rails... その中で ITSU WORKS が Flask を主軸に据えている理由を解説します。</p><h2>最速でプロトタイプが作れる</h2><p>Flask は「マイクロフレームワーク」と呼ばれるだけあって、最小構成が非常にシンプルです。ファイル 1 つから始められる手軽さは、アイデアを即座にプロトタイプに落とし込む上で大きなアドバンテージです。</p><pre><code>from flask import Flask\napp = Flask(__name__)\n\n@app.route('/')\ndef index():\n    return 'Hello, World!'</code></pre><h2>Python エコシステムの恩恵</h2><p>Python は AI/ML、データ処理、スクレイピングのライブラリが圧倒的に充実しています。Flask をハブにして、Playwright でスクレイピング、FFmpeg で動画処理、AI API で推論、という組み合わせが自然に実現できます。</p><h2>Cloud Run との相性</h2><p>Flask アプリを Docker コンテナに詰めて Cloud Run にデプロイする流れが非常にスムーズです。gunicorn を使えば本番対応も簡単です。</p><h2>Django を選ばない理由</h2><p>Django は素晴らしいフレームワークですが、個人開発においては「必要以上に大きい」ことが多いです。管理画面、ORM、認証システムなど、使わない機能が含まれています。Flask なら必要なものだけを組み合わせて軽量に保てます。</p><p>もちろん、フロントエンドが複雑な場合は Next.js を使うなど、適材適所で技術を選んでいます。大切なのは「銀の弾丸」を求めるのではなく、プロジェクトの性質に合った選択をすることです。</p>"
+  },
+  {
+    "id": "playwright-automation-guide",
+    "title": "Playwright で業務自動化を始める — 実践ガイド",
+    "date": "2026-03-10",
+    "category": "Automation",
+    "excerpt": "Selenium の時代は終わりました。Playwright を使ったブラウザ自動化の基本から、実際の業務で使えるテクニックまでを解説します。",
+    "tags": ["Playwright", "自動化", "Python"],
+    "content": "<p>ブラウザ自動化といえば Selenium が長年のスタンダードでしたが、現在は Microsoft が開発する Playwright が最良の選択肢です。ITSU WORKS のプロジェクトでも全面的に Playwright を採用しています。</p><h2>Playwright の優位性</h2><p>Selenium と比較して、Playwright には以下の利点があります：</p><ul><li><strong>自動待機:</strong> 要素が表示されるまで自動的に待機するため、<code>sleep</code> を書く必要がほぼありません</li><li><strong>複数ブラウザ対応:</strong> Chromium、Firefox、WebKit を統一 API で操作可能</li><li><strong>ネットワーク制御:</strong> リクエストの傍受、モックが簡単</li><li><strong>高速:</strong> ブラウザとの通信が CDP ベースで高速</li></ul><h2>基本的な使い方</h2><pre><code>from playwright.sync_api import sync_playwright\n\nwith sync_playwright() as p:\n    browser = p.chromium.launch(headless=True)\n    page = browser.new_page()\n    page.goto('https://example.com')\n    title = page.title()\n    print(f'Title: {title}')\n    browser.close()</code></pre><h2>実務での活用例</h2><p>ITSU WORKS では、以下のような業務で Playwright を活用しています：</p><ul><li>ニュースサイトからの定期的なデータ収集</li><li>SNS への自動投稿</li><li>Web アプリケーションの E2E テスト</li><li>クラウドソーシングサイトでの案件検索</li></ul><p>ポイントは、<strong>ブラウザプロファイルの再利用</strong>です。ログイン状態を維持したプロファイルを使い回すことで、認証の手間を省けます。</p><pre><code>context = browser.new_context(\n    storage_state='auth_state.json'\n)</code></pre><p>自動化は「一度作れば永遠に働く従業員」です。初期投資は必要ですが、ROI は確実にプラスになります。</p>"
+  }
+]

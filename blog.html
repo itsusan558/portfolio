@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog | ITSU WORKS</title>
+  <meta name="description" content="ITSU WORKS の技術ブログ。開発・自動化・AIに関する知見を発信しています。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #fafafa;
+      --bg-surface: #ffffff;
+      --bg-elevated: #f5f5f0;
+      --bg-dark: #0f0f0f;
+      --text-primary: #111111;
+      --text-secondary: #555555;
+      --text-muted: #999999;
+      --text-on-dark: #f0f0f0;
+      --text-on-dark-secondary: #aaaaaa;
+      --accent-color: #2563eb;
+      --accent-color-light: #3b82f6;
+      --border: #e5e5e5;
+      --border-dark: #2a2a2a;
+      --font-sans: 'Inter', sans-serif;
+      --font-jp: 'Zen Kaku Gothic New', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body { background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-sans); line-height: 1.7; }
+    ::selection { background: var(--accent-color); color: #fff; }
+    a { color: inherit; text-decoration: none; transition: color 0.3s ease; }
+
+    /* NAV */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      padding: 1.25rem 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; }
+    .nav-logo a { color: var(--text-primary); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { font-size: 0.82rem; font-weight: 500; color: var(--text-secondary); }
+    .nav-links a:hover { color: var(--accent-color); }
+    .nav-links a.active { color: var(--accent-color); }
+    .nav-cta {
+      font-size: 0.8rem; font-weight: 600; color: #fff !important;
+      background: var(--accent-color); padding: 0.5rem 1.2rem; border-radius: 6px;
+    }
+    .nav-cta:hover { background: var(--accent-color-light); }
+
+    /* PAGE HEADER */
+    .page-header {
+      padding: 8rem 2rem 4rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .page-header-label {
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--accent-color); margin-bottom: 1rem;
+    }
+    .page-header-title {
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      font-weight: 800; letter-spacing: -0.03em; line-height: 1.2;
+      margin-bottom: 0.75rem;
+    }
+    .page-header-desc {
+      font-family: var(--font-jp);
+      font-size: 1rem; color: var(--text-secondary); line-height: 2;
+    }
+
+    /* FILTER */
+    .filter-bar {
+      max-width: 900px; margin: 0 auto;
+      padding: 0 2rem 2rem;
+      display: flex; gap: 0.5rem; flex-wrap: wrap;
+    }
+    .filter-btn {
+      font-size: 0.78rem; font-weight: 500;
+      padding: 0.4rem 1rem; border-radius: 100px;
+      border: 1px solid var(--border); background: var(--bg-surface);
+      color: var(--text-secondary); cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .filter-btn:hover { border-color: var(--accent-color); color: var(--accent-color); }
+    .filter-btn.active {
+      background: var(--accent-color); color: #fff;
+      border-color: var(--accent-color);
+    }
+
+    /* POST LIST */
+    .posts {
+      max-width: 900px; margin: 0 auto;
+      padding: 0 2rem 6rem;
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .post-item {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 2rem;
+      padding: 2rem 0;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.3s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+    .post-item:first-child { border-top: 1px solid var(--border); }
+    .post-item:hover { background: var(--bg-elevated); margin: 0 -1rem; padding: 2rem 1rem; border-radius: 8px; border-color: transparent; }
+    .post-item:hover + .post-item { border-top-color: transparent; }
+    .post-meta {
+      display: flex; flex-direction: column; gap: 0.5rem;
+      padding-top: 0.2rem;
+    }
+    .post-date {
+      font-family: var(--font-mono);
+      font-size: 0.75rem; color: var(--text-muted);
+    }
+    .post-category {
+      font-size: 0.68rem; font-weight: 600;
+      color: var(--accent-color);
+      letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .post-title {
+      font-size: 1.2rem; font-weight: 700;
+      letter-spacing: -0.01em; line-height: 1.4;
+      margin-bottom: 0.5rem;
+    }
+    .post-excerpt {
+      font-family: var(--font-jp);
+      font-size: 0.88rem; color: var(--text-secondary);
+      line-height: 1.9;
+      margin-bottom: 0.75rem;
+    }
+    .post-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .post-tag {
+      font-family: var(--font-mono);
+      font-size: 0.62rem; color: var(--text-muted);
+      background: var(--bg-elevated);
+      padding: 0.2rem 0.5rem; border-radius: 3px;
+    }
+    .post-arrow {
+      font-size: 0.8rem; color: var(--accent-color);
+      opacity: 0; transition: opacity 0.3s ease;
+    }
+    .post-item:hover .post-arrow { opacity: 1; }
+
+    /* EMPTY STATE */
+    .posts-empty {
+      text-align: center; padding: 4rem 2rem;
+      color: var(--text-muted);
+      font-family: var(--font-jp);
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 3rem;
+    }
+    .footer-inner {
+      max-width: 900px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-copy { font-size: 0.72rem; color: var(--text-muted); }
+    .footer-back a { font-size: 0.72rem; color: var(--text-muted); }
+    .footer-back a:hover { color: var(--accent-color); }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .nav { padding: 1rem 1.5rem; }
+      .nav-cta { display: none; }
+      .post-item { grid-template-columns: 1fr; gap: 0.5rem; }
+      .post-meta { flex-direction: row; gap: 1rem; }
+      .footer-inner { flex-direction: column; gap: 1rem; text-align: center; }
+    }
+    @media (max-width: 480px) {
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo"><a href="index.html">ITSU WORKS</a></div>
+  <ul class="nav-links">
+    <li><a href="index.html#services">Services</a></li>
+    <li><a href="index.html#works">Works</a></li>
+    <li><a href="blog.html" class="active">Blog</a></li>
+    <li><a href="index.html#about">About</a></li>
+    <li><a href="index.html#contact" class="nav-cta">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-label">Blog</div>
+  <h1 class="page-header-title">技術ブログ</h1>
+  <p class="page-header-desc">
+    開発・自動化・AI に関する知見やノウハウを発信しています。
+  </p>
+</div>
+
+<div class="filter-bar" id="filterBar"></div>
+
+<div class="posts" id="postsContainer">
+  <div class="posts-empty">読み込み中...</div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <span class="footer-copy">&copy; 2026 ITSU WORKS. All rights reserved.</span>
+    <div class="footer-back"><a href="index.html">&larr; トップに戻る</a></div>
+  </div>
+</footer>
+
+<script>
+  let allPosts = [];
+  let activeFilter = 'all';
+
+  async function loadPosts() {
+    const res = await fetch('posts.json');
+    allPosts = await res.json();
+    allPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
+    buildFilters();
+    renderPosts();
+  }
+
+  function buildFilters() {
+    const categories = ['all', ...new Set(allPosts.map(p => p.category))];
+    const bar = document.getElementById('filterBar');
+    bar.innerHTML = categories.map(cat =>
+      `<button class="filter-btn ${cat === 'all' ? 'active' : ''}" data-cat="${cat}">${cat === 'all' ? 'All' : cat}</button>`
+    ).join('');
+    bar.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeFilter = btn.dataset.cat;
+        bar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderPosts();
+      });
+    });
+  }
+
+  function renderPosts() {
+    const container = document.getElementById('postsContainer');
+    const filtered = activeFilter === 'all'
+      ? allPosts
+      : allPosts.filter(p => p.category === activeFilter);
+
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="posts-empty">該当する記事がありません。</div>';
+      return;
+    }
+
+    container.innerHTML = filtered.map(post => {
+      const date = new Date(post.date);
+      const dateStr = `${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')}`;
+      const tags = post.tags.map(t => `<span class="post-tag">${t}</span>`).join('');
+      return `
+        <a href="post.html?id=${post.id}" class="post-item">
+          <div class="post-meta">
+            <span class="post-date">${dateStr}</span>
+            <span class="post-category">${post.category}</span>
+          </div>
+          <div>
+            <h2 class="post-title">${post.title} <span class="post-arrow">&rarr;</span></h2>
+            <p class="post-excerpt">${post.excerpt}</p>
+            <div class="post-tags">${tags}</div>
+          </div>
+        </a>
+      `;
+    }).join('');
+  }
+
+  loadPosts();
+</script>
+
+</body>
+</html>
